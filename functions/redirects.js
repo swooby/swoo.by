@@ -18,6 +18,54 @@ exports.redirects = {
     "/cv",
     "/r",
   ],
+  // resume: code
+  "https://github.com/paulpv/resume/blob/main/src/App.tsx": [
+    "/pv/resume/code",
+    "/resume/code",
+    "/pv/cv/code",
+    "/pvcv/code",
+    "/cv/code",
+    "/r/code",
+  ],
+  // resume: readme
+  "https://github.com/paulpv/resume/blob/main/README.md": [
+    "/pv/resume/readme",
+    "/resume/readme",
+    "/pv/cv/readme",
+    "/pvcv/readme",
+    "/cv/readme",
+    "/r/readme",
+  ],
+  // resume: issues
+  "https://github.com/paulpv/resume/issues": [
+    "/pv/resume/issues",
+    "/resume/issues",
+    "/pv/cv/issues",
+    "/pvcv/issues",
+    "/cv/issues",
+    "/r/issues",
+  ],
+  // resume: data
+  "https://swooby.com/pv/resume/resume.json": [
+    "/pv/resume.json",
+    "/pv/resume/json",
+    "/resume.json",
+    "/resume/json",
+    "/pv/cv.json",
+    "/pv/cv/json",
+    "/pvcv.json",
+    "/pvcv/json",
+    "/cv.json",
+    "/cv/json",
+    "/r.json",
+    "/r/json",
+    "/pv/resume/data",
+    "/resume/data",
+    "/pv/cv/data",
+    "/pvcv/data",
+    "/cv/data",
+    "/r/data",
+  ],
   // resume: pv LinkedIn
   "https://linkedin.com/in/paulpv": [
     "/pv/linkedin",

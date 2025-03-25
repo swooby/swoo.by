@@ -139,6 +139,10 @@ Try some of the urls defined in [./functions/redirects.js](./functions/redirects
 * http://swoo.by/resume
 * http://swoo.by/pv/cv
 * http://swoo.by/pv/resume
+* http://swoo.by/r
+* http://swoo.by/r/code
+* http://swoo.by/r/data
+* http://swoo.by/r/json
 
 ## Deploy
 
