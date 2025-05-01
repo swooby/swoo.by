@@ -15,6 +15,8 @@ exports.redirects = {
     "/resume",
     "/pv/cv",
     "/pvcv",
+    "/pv/r",
+    "/pvr",
     "/cv",
     "/r",
   ],
@@ -87,7 +89,7 @@ exports.redirects = {
     "/prom-ap9pro",
   ],
   // resume: Promethean, Inc. ActivPanel 9
-  "https://www.prometheanworld.com/products/interactive-displays/activpanel/": [
+  "https://www.prometheanworld.com/products/interactive-displays/activpanel-9/": [
     "/prom/ap9",
     "/prom-ap9",
   ],
