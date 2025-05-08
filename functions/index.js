@@ -70,4 +70,4 @@ function initializeRedirects() {
 
 initializeRedirects();
 
-exports.requestHandler = functions.https.onRequest(app);
+exports.requestHandler = functions.https.onRequest({minInstances: 1}, app);

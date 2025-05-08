@@ -27,7 +27,7 @@
         "source": "**",
         "function": {
           "functionId": "requestHandler",
-          "pinTag": true
+          "pinTag": false
         }        
       }
     ]
