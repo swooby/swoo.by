@@ -19,15 +19,15 @@ const app = express();
 const cors = require("cors");
 app.use(cors({origin: true}));
 
-/*
+const axios = require("axios");
+
 /**
  * Check if the functions are running in emulator mode.
- * @returns {boolean} - True if running in emulator, false otherwise.
- * /
+ * @return {boolean} - True if running in emulator, false otherwise.
+ */
 function isEmulator() {
   return process.env.FUNCTIONS_EMULATOR ? true : false;
 }
-*/
 
 /**
  * Quote a string (intended for logging).
@@ -37,8 +37,6 @@ function isEmulator() {
 function quote(str) {
   return typeof str === "string" ? `"${str}"` : str;
 }
-
-const axios = require("axios");
 
 /**
  * Get geo information for a given IP address.
@@ -111,25 +109,34 @@ async function getGeoInfoCached(ip) {
  * @param {*} req - The request object.
  * @return {string} - The IP address.
  */
-async function getIpString(req) {
+async function getRequestIp(req) {
   const VERBOSE_LOGGING = false;// isEmulator();
 
   const xForwardedFor = req.get("x-forwarded-for");
   if (VERBOSE_LOGGING) {
     // logger.debug(`logAndRedirect: req=`, req);
-    logger.debug(`logAndRedirect: req.get("x-forwarded-for")=` +
+    logger.debug(`getRequestIp: req.get("x-forwarded-for")=` +
         `${quote(xForwardedFor)}`);
   }
 
   const remoteIp = xForwardedFor?.split(",")[0] || "127.0.0.1";
   const geoInfo = await getGeoInfoCached(remoteIp);
   if (VERBOSE_LOGGING) {
-    logger.debug(`logAndRedirect: geoInfo[${remoteIp}]=`,
+    logger.debug(`getRequestIp: geoInfo[${remoteIp}]=`,
         JSON.stringify(geoInfo));
   }
   const geoString = geoInfo ? ` (${geoInfo.country}, ${geoInfo.city})` : "";
-  const ipString = `${quote(remoteIp)}${geoString}`;
-  return ipString;
+  const ipString = `${remoteIp}${geoString}`;
+  return {ip: remoteIp, ipString};
+}
+
+/**
+ * Remove the trailing slash from a URL if it exists.
+ * @param {string} url - The URL to process.
+ * @return {string} - The URL without the trailing slash.
+ */
+function removeTrailingSlash(url) {
+  return url.replace(/\/$/, "");
 }
 
 /**
@@ -139,17 +146,57 @@ async function getIpString(req) {
  * @param {string} to - The URL to redirect to.
  */
 async function logAndRedirect(req, res, to) {
-  const ipString = await getIpString(req);
-  const from = req.url;
+  const {ipString} = await getRequestIp(req);
+  const from = removeTrailingSlash(req.url);
   logger.info(`logAndRedirect: ip=${ipString}, ${req.method} ${from} -> ${to}`);
 
   // TODO: Log this to firestore?
-  // TODO: Log this to analytics...
 
-  // https://expressjs.com/en/api.html#res.redirect
-  // Always do 307!
-  // 301 will be cached by the user browser and may never expire. :/
-  res.redirect(307, to);
+  // Client side redirect; shows well on Analytics dashboard
+  const measurementId = "G-3FMC11TXNR";
+  const title = `Redirect to ${JSON.stringify(to)}…`;
+  const userId = JSON.stringify(ipString);
+  const redirectTo = JSON.stringify(to);
+  res.set("Content-Type", "text/html");
+  res.status(200).send(`<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <title>${title}</title>
+    <!--
+    https://developers.google.com/tag-platform/gtagjs#add_the_google_tag_to_your_website
+    -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=${measurementId}"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', '${measurementId}', {
+        //'page_title': window.location.href,
+        //'page_location': window.location.href,
+        user_id: ${userId},
+        // https://support.google.com/analytics/answer/7201382?hl=en&utm_id=ad#zippy=%2Cgoogle-tag-gtagjs
+        // "setting the parameter to false doesn't disable debug mode"
+        // 'debug_mode': ${isEmulator()}, 
+      });
+    </script>
+    <script>
+      var redirectTo = ${redirectTo};
+      gtag('event', 'redirect', {
+        to: redirectTo,
+        transport_type: 'beacon',
+        event_callback: function() {
+          window.location.replace(redirectTo);
+        },
+        //event_timeout: 2000
+      });
+    </script>
+  </head>
+  <body style="background:#000;color:#fff;font-family:monospace,monospace;">
+    <p>${title}</p>
+  </body>
+</html>
+`);
 }
 
 /**
@@ -158,7 +205,7 @@ async function logAndRedirect(req, res, to) {
  * @param {*} res
  */
 async function catchall(req, res) {
-  const ipString = await getIpString(req);
+  const {ipString} = await getRequestIp(req);
   const from = req.url;
   logger.warn(`catchall: ip=${ipString}, Unhandled ${req.method} ${from}`);
 
@@ -166,7 +213,7 @@ async function catchall(req, res) {
 
   res.status(404).send(`<!DOCTYPE html>
 <html>
-<body style="background:#000;color:#fff;font-family:monospace;">
+<body style="background:#000;color:#fff;font-family:monospace,monospace;">
 Not Found
 </body>
 </html>`);
