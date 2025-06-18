@@ -199,4 +199,9 @@ exports.redirects = {
   "https://worldwide.espacenet.com/publicationDetails/biblio?FT=D&CC=WO&NR=2013116741A1": [
     "/WO2013116741",
   ],
+  // resume: References
+  "https://www.linkedin.com/in/paulpv/details/recommendations/": [
+    "/pv/references",
+    "/pv/refs",
+  ],
 };
