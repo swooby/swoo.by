@@ -9,6 +9,13 @@ exports.redirects = {
     "/meeting",
     "/meet",
   ],
+  // Pv's Calendar
+  "https://calendar.google.com/calendar/u/0?cid=cGF1bC5wZWF2eWhvdXNlQGdtYWlsLmNvbQ": [
+    "/pv/calendar",
+    "/calendar",
+    "/pv/cal",
+    "/cal",
+  ],
   // resume
   "https://swooby.com/pv/resume": [
     "/pv/resume",
